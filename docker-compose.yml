@@ -1,0 +1,16 @@
+services:
+  mongo:
+    image: mongo
+    container_name: my-mongo-for-civil-guruji
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_civil_guruji_volume:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: RootPassword9121
+
+volumes:
+  mongo_civil_guruji_volume:
+    driver: local
