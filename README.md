@@ -23,13 +23,13 @@ The project uses **Docker Compose** to orchestrate services including an Express
 
 The application is fully containerized, so you don’t need to install Node.js or MongoDB locally.
 
-### Start the application
+## Start the application
 docker compose up -d --build
 
-### stop the application
+## Stop the application
 docker compose down
 
-### stop the application and remove volume
+## Stop the application and remove volume
 docker compose down -v
 
 ## Features
