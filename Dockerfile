@@ -13,7 +13,7 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-EXPOSE 3500
+EXPOSE ${PORT}
 
 # Start the application
 CMD ["sh", "-c", "npm run build && npm start"]

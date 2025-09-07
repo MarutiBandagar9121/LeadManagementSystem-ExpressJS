@@ -4,7 +4,7 @@ services:
     container_name: my-mongo-for-civil-guruji
     restart: always
     ports:
-      - "27017:27017"
+      - "${MONGO_PORT}:${MONGO_PORT}"
     volumes:
       - mongo_civil_guruji_volume:/data/db
     environment:
