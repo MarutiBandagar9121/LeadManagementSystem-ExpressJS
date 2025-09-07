@@ -1,0 +1,13 @@
+enum LeadStatusEnum {
+  NEW = "NEW",
+  CONTACTED = "CONTACTED",
+  QUALIFIED = "QUALIFIED",
+  PROPOSAL_SENT = "PROPOSAL_SENT",
+  NEGOTIATION = "NEGOTIATION",
+  WON = "WON",
+  LOST = "LOST",
+  ON_HOLD = "ON_HOLD",
+  UNQUALIFIED = "UNQUALIFIED",
+}
+
+export default LeadStatusEnum;
