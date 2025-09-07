@@ -5,6 +5,7 @@ import {UpdateLeadSchema} from '../validator/UpdateLeadValidator';
 import * as z from "zod";
 import LeadStatusEnum from '../constants/LeadStatusEnum';
 import mongoose from 'mongoose';
+import InvalidIdError from '../errors/InvalidIdError';
 
 const create = async(req:Request,res:Response) =>{
 
@@ -38,6 +39,7 @@ const create = async(req:Request,res:Response) =>{
 const getById = async(req:Request,res:Response) =>{
   console.log("lead/get-by-id request recived: ",req.params.id);
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    throw new InvalidIdError();
     return res.status(400).json({ message: "Invalid ID format" });
   }
   const lead = await LeadModel.findById(req.params.id);

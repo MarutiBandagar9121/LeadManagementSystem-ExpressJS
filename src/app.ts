@@ -3,6 +3,8 @@ import TestRoutes from "./routes/TestRoutes"
 import connectDB from "./config/Database";
 import Config from "./config/Config"
 import LeadRoutes from "./routes/LeadRoutes";
+import { errorHandler } from "./middleware/ErrorHandler";
+
 
 
 const startServer = async () => {
@@ -21,6 +23,9 @@ const startServer = async () => {
     app.listen(Config.port, () => {
       console.log(`Civil Guruji app listening on port ${Config.port}`);
     });
+
+    //middleware
+    app.use(errorHandler);
 
   } catch (error) {
     console.error("Failed to start server:", error);
