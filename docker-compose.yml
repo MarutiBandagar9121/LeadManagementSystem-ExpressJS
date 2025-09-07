@@ -8,8 +8,8 @@ services:
     volumes:
       - mongo_civil_guruji_volume:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: RootPassword9121
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
 
 volumes:
   mongo_civil_guruji_volume:
