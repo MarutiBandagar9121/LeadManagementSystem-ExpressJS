@@ -10,6 +10,43 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    networks:
+      - civil-guruji-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # Express API service
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: civil-guruji-api
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=production
+  #     - PORT=3000
+  #     - MONGO_DB_NAME=${MONGO_DB_NAME}
+  #     - MONGO_USERNAME=${MONGO_USERNAME}
+  #     - MONGO_PASSWORD=${MONGO_PASSWORD}
+  #     - MONGO_HOST=${MONGO_HOST}
+  #     - MONGO_PORT=${MONGO_PORT}
+  #   depends_on:
+  #     mongo:
+  #       condition: service_healthy
+  #   networks:
+  #     - civil-guruji-network
+  #   volumes:
+  #     - ./logs:/app/logs
+
+networks:
+  civil-guruji-network:
+    driver: bridge
 
 volumes:
   mongo_civil_guruji_volume:

@@ -76,6 +76,7 @@ const updateStatus = async(req:Request,res:Response,next:NextFunction) =>{
 }
 
 const getAll = async(req:Request,res:Response,next:NextFunction) =>{
+  console.log("Getting all leads");
   try{
     const allLeads = await LeadModel.find();
     if(!allLeads){

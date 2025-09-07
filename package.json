@@ -4,8 +4,8 @@
   "description": "Lead management system for civil guruji",
   "main": "src/app.js",
   "scripts": {
-    "build": "tsc",
     "start": "node dist/app.js",
+    "build": "tsc",
     "dev": "nodemon"
   },
   "author": "Maruti Mallinath Bandagar",
