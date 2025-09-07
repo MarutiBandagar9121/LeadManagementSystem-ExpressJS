@@ -6,7 +6,6 @@ interface ApiErrorResponse {
     details?: any;
     timestamp: string;
     path: string;
-    requestId?: string;
   };
 }
 

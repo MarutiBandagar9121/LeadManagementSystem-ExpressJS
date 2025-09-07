@@ -3,7 +3,6 @@ interface ApiSuccessResponse<T = any> {
   data: T;
   message?: string;
   timestamp: string;
-  requestId?: string;
 }
 
 export default ApiSuccessResponse;

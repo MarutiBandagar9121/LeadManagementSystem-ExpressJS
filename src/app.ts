@@ -3,7 +3,8 @@ import TestRoutes from "./routes/TestRoutes"
 import connectDB from "./config/Database";
 import Config from "./config/Config"
 import LeadRoutes from "./routes/LeadRoutes";
-import { errorHandler } from "./middleware/ErrorHandler";
+import { ErrorHandler } from "./middleware/ErrorHandler";
+import { ResponseMiddleware } from "./middleware/ResponseMiddleware";
 
 
 
@@ -16,6 +17,10 @@ const startServer = async () => {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
+    //response middleware
+    app.use(ResponseMiddleware);
+
+    //routes
     app.use("/test", TestRoutes);
     app.use("/lead", LeadRoutes);
 
@@ -24,8 +29,8 @@ const startServer = async () => {
       console.log(`Civil Guruji app listening on port ${Config.port}`);
     });
 
-    //middleware
-    app.use(errorHandler);
+    //error middleware
+    app.use(ErrorHandler);
 
   } catch (error) {
     console.error("Failed to start server:", error);
