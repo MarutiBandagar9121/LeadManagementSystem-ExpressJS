@@ -3,7 +3,7 @@ import ApiSuccessResponse from '../models/APiSuccessResponse';
 
 export const ResponseMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   
-  (res as any).sendSuccessResponse= function<T>(
+  (res as any).sendSuccessResponse = function<T>(
     data: T, 
     message?: string, 
     statusCode: number = 200

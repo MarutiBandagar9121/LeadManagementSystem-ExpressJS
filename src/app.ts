@@ -21,8 +21,8 @@ const startServer = async () => {
     app.use(ResponseMiddleware);
 
     //routes
-    app.use("/test", TestRoutes);
-    app.use("/lead", LeadRoutes);
+    app.use("/api/test", TestRoutes);
+    app.use("/api/lead", LeadRoutes);
 
 
     app.listen(Config.port, () => {
