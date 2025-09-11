@@ -1,8 +1,9 @@
 import express, { type Application } from "express";
 import TestRoutes from "./routes/TestRoutes"
+import LeadRoutes from "./routes/LeadRoutes";
+import UserRoutes from "./routes/UserRoutes";
 import connectDB from "./config/Database";
 import Config from "./config/Config"
-import LeadRoutes from "./routes/LeadRoutes";
 import { ErrorHandler } from "./middleware/ErrorHandler";
 import { ResponseMiddleware } from "./middleware/ResponseMiddleware";
 
@@ -23,6 +24,7 @@ const startServer = async () => {
     //routes
     app.use("/api/test", TestRoutes);
     app.use("/api/lead", LeadRoutes);
+    app.use("/api/user", UserRoutes);
 
 
     app.listen(Config.port, () => {

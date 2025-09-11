@@ -1,5 +1,5 @@
 import { NextFunction, type Request, type Response} from 'express';  
-import LeadModel from '../models/LeadModel';
+import LeadModel from '../repository/LeadModel';
 import {createLeadSchema} from '../validator/CreateLeadValidator';
 import {UpdateLeadSchema} from '../validator/UpdateLeadValidator';
 import * as z from "zod";
@@ -65,7 +65,7 @@ const updateStatus = async(req:Request,res:Response,next:NextFunction) =>{
     if(lead.leadStatus == updateLeadStatusReq.status){
       throw new ResourceNotFoundError("Lead status is already: "+updateLeadStatusReq.status);
     }
-    lead.leadStatus = updateLeadStatusReq.status;
+    lead.leadStatus = updateLeadStatusReq.status as LeadStatusEnum;
     lead = await LeadModel.findByIdAndUpdate(updateLeadStatusReq.id,lead,{new:true});
     if(lead){
       (res as any).sendSuccessResponse({id:lead._id,message:"Lead status updated successfully",status:lead.leadStatus},"Lead status updated successfully",200);
