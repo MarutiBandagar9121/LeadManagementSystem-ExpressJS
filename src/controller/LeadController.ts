@@ -13,7 +13,7 @@ const create = async(req:Request,res:Response,next:NextFunction) =>{
   try{
     const parsed = createLeadSchema.safeParse(req.body);
     if (!parsed.success) {
-      throw new InvalidDataFormat("Invalid Payload",parsed.error.flatten());
+      throw new InvalidDataFormat("Invalid Payload",z.treeifyError(parsed.error));
     }
     const { email, phone } = parsed.data;
     const existingLead = await LeadModel.findOne({
@@ -55,7 +55,7 @@ const updateStatus = async(req:Request,res:Response,next:NextFunction) =>{
   try{
     const parsed = UpdateLeadSchema.safeParse(req.body);
     if (!parsed.success) {
-      throw new InvalidDataFormat("Invalid Payload",parsed.error.flatten());
+      throw new InvalidDataFormat("Invalid Payload",z.treeifyError(parsed.error));
     }
     let updateLeadStatusReq = parsed.data;
     let lead = await LeadModel.findById(updateLeadStatusReq.id);
@@ -100,7 +100,7 @@ const getAllByStatus = async(req:Request,res:Response,next:NextFunction) =>{
   }
   catch(error){
     if(error instanceof z.ZodError){
-      throw new InvalidDataFormat("Invalid Payload",error.flatten());
+      throw new InvalidDataFormat("Invalid Payload",z.treeifyError(error));
     }
     next(error);
   }
