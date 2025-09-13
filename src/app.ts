@@ -3,6 +3,7 @@ import TestRoutes from "./routes/TestRoutes"
 import LeadRoutes from "./routes/LeadRoutes";
 import UserRoutes from "./routes/UserRoutes";
 import connectDB from "./config/Database";
+import { connectToRedis } from "./config/redis";
 import Config from "./config/Config"
 import { ErrorHandler } from "./middleware/ErrorHandler";
 import { ResponseMiddleware } from "./middleware/ResponseMiddleware";
@@ -12,6 +13,7 @@ import { ResponseMiddleware } from "./middleware/ResponseMiddleware";
 const startServer = async () => {
   try {
     await connectDB();
+    await connectToRedis();
 
     const app: Application = express();
 

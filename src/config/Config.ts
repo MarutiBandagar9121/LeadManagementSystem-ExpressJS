@@ -9,6 +9,9 @@ interface Config {
     mongoDbName?: string;
     mongoPort?: string;
     bcryptSaltRounds: number;
+    redisPort: string;
+    redisHost?: string;
+    redisTls: string;
     [key: string]: string | number | undefined;
 }
 
@@ -18,7 +21,7 @@ const requiredEnvVars = [
     "MONGO_HOST",
     "MONGO_DB_NAME",
     "MONGO_PORT",
-    "BCRYPT_SALT_ROUNDS"
+    "REDIS_HOST"
 ] as const;
 
 for (const key of requiredEnvVars) {
@@ -34,7 +37,10 @@ const config: Config = {
     mongoHost: process.env.MONGO_HOST,
     mongoDbName: process.env.MONGO_DB_NAME,
     mongoPort: process.env.MONGO_PORT,
-    bcryptSaltRounds: process.env.BCRYPT_SALT_ROUNDS ? parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) : 10
+    bcryptSaltRounds: process.env.BCRYPT_SALT_ROUNDS ? parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) : 10,
+    redisHost: process.env.REDIS_HOST,
+    redisPort: process.env.REDIS_PORT ? process.env.REDIS_PORT : "6379",
+    redisTls: process.env.REDIS_TLS ? process.env.REDIS_TLS : "false"
 }
 
 export default config;

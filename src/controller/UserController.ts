@@ -8,6 +8,8 @@ import ResourceNotFoundError from '../errors/ResourceNotFoundError';
 import * as z from "zod";
 import bcrypt from 'bcrypt';
 import config from '../config/Config';
+import { client } from '../config/redis';
+import UserStatusEnum from '../constants/UserStatusEnum';
 
 const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
     try{
@@ -24,11 +26,60 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
         const saltRounds = config.bcryptSaltRounds;
         const hashedPassword = await bcrypt.hash(user.password, saltRounds);
         user.password = hashedPassword;
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        await client.set(user.email, otp, {
+            EX:180
+        });
+        console.log(`OTP for ${user.email} is ${otp}`);
         userModelObj.set(user);
         await userModelObj.save();
-        (res as any).sendSuccessResponse({id:userModelObj._id},"User registered successfully",201);
+        (res as any).sendSuccessResponse({id:userModelObj._id},"User registered successfully. OTP sent to email",201);
     }
     catch(error){
+        next(error);
+    }
+}
+
+const verifyEmail = async (req:Request, res:Response, next:NextFunction)=>{
+    try{
+        const userEmail = req.query.email as string;
+        const userOtp = req.query.otp as string;
+        if(!userEmail || !userOtp){
+            throw new InvalidDataFormat("Email and OTP are required");
+        }
+        let user = await UserModel.findOne({email:userEmail});
+        if(!user){
+            throw new ResourceNotFoundError("User not found");
+        }
+        const storedOtp = await client.get(userEmail);
+        if(!storedOtp){
+            throw new ResourceNotFoundError("OTP expired. Please request a new one");
+        }
+        if(storedOtp !== userOtp){
+            throw new InvalidDataFormat("Invalid OTP");
+        }
+        await client.del(userEmail);
+        user.status = UserStatusEnum.APPROVED;
+        await user.save();
+        (res as any).sendSuccessResponse({email:userEmail},"Email verified successfully",200);
+    }catch(error){
+        next(error);
+    }
+}
+
+const resendOtp = async (req:Request, res:Response, next:NextFunction)=>{
+    try{
+        const userEmail = req.query.email as string;
+        if(!userEmail){
+            throw new InvalidDataFormat("Email is required");
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        await client.set(userEmail, otp, {
+            EX:180
+        });
+        console.log(`OTP for ${userEmail} is ${otp}`);
+        (res as any).sendSuccessResponse({email:userEmail},"OTP resent successfully",200);
+    }catch(error){
         next(error);
     }
 }
@@ -58,5 +109,7 @@ const login = async (req:Request, res:Response, next:NextFunction)=>{
 
 export default{
     registerUser,
-    login
+    login,
+    verifyEmail,
+    resendOtp
 }

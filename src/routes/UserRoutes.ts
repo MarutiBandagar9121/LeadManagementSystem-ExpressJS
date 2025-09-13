@@ -1,9 +1,11 @@
 import { Router } from "express";
-import UserContrroller from "../controller/UserContrroller";
+import UserController from "../controller/UserController";
 
 const router = Router();
 
-router.post("/register", UserContrroller.registerUser);
-router.post("/login", UserContrroller.login);
+router.post("/register", UserController.registerUser);
+router.post("/login", UserController.login);
+router.post("/verify-email", UserController.verifyEmail);
+router.post("/resend-otp",UserController.resendOtp);
 
 export default router;

@@ -19,14 +19,16 @@ services:
       retries: 5
       start_period: 40s
   
-  # redis:
-  #   image: redis
-  #   container_name: my-redis-for-civil-guruji
-  #   restart: always
-  #   ports:
-  #     - "${REDIS_PORT}:${REDIS_PORT}"
-  #   networks:
-  #     - civil-guruji-network
+  redis:
+    image: redis
+    container_name: my-redis-for-civil-guruji
+    restart: always
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - civil-guruji-network
+    volumes:
+      - redis_civil_guruji_volume:/data
 
   # Express API service
   # api:
@@ -59,4 +61,6 @@ networks:
 
 volumes:
   mongo_civil_guruji_volume:
+    driver: local
+  redis_civil_guruji_volume:
     driver: local
