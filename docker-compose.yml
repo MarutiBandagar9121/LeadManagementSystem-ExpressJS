@@ -18,6 +18,15 @@ services:
       timeout: 10s
       retries: 5
       start_period: 40s
+  
+  # redis:
+  #   image: redis
+  #   container_name: my-redis-for-civil-guruji
+  #   restart: always
+  #   ports:
+  #     - "${REDIS_PORT}:${REDIS_PORT}"
+  #   networks:
+  #     - civil-guruji-network
 
   # Express API service
   # api:

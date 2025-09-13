@@ -1,13 +1,13 @@
 import { NextFunction, type Request, type Response} from 'express'; 
 import { RegisterUserSchema } from '../validator/RegisterUserValidator';
+import { UserLoginSchema } from '../validator/UserLoginValidator';
 import InvalidDataFormat from '../errors/InvalidDataFormat';
 import UserModel from '../repository/UserModel';
 import DuplicateRecordError from '../errors/DuplicateRecordError';
+import ResourceNotFoundError from '../errors/ResourceNotFoundError';
 import * as z from "zod";
 import bcrypt from 'bcrypt';
 import config from '../config/Config';
-import { UserLoginSchema } from '../validator/UserLoginValidator';
-import ResourceNotFoundError from '../errors/ResourceNotFoundError';
 
 const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
     try{
@@ -40,6 +40,7 @@ const login = async (req:Request, res:Response, next:NextFunction)=>{
             throw new ResourceNotFoundError("Invalid Payload",z.treeifyError(parsed.error));
         }
         let loginPayload = parsed.data;
+        console.log("Login Payload: ",loginPayload);
         const user = await UserModel.findOne({email:loginPayload.email});
         if(!user){
             throw new ResourceNotFoundError("Invalid email or password");
