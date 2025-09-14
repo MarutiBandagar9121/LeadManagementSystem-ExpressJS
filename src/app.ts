@@ -8,8 +8,6 @@ import Config from "./config/Config"
 import { ErrorHandler } from "./middleware/ErrorHandler";
 import { ResponseMiddleware } from "./middleware/ResponseMiddleware";
 
-
-
 const startServer = async () => {
   try {
     await connectDB();

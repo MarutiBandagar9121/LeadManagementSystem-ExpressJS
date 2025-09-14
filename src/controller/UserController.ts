@@ -10,6 +10,7 @@ import bcrypt from 'bcrypt';
 import config from '../config/Config';
 import { client } from '../config/redis';
 import UserStatusEnum from '../constants/UserStatusEnum';
+import jwt from 'jsonwebtoken';
 
 const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
     try{
@@ -94,13 +95,19 @@ const login = async (req:Request, res:Response, next:NextFunction)=>{
         console.log("Login Payload: ",loginPayload);
         const user = await UserModel.findOne({email:loginPayload.email});
         if(!user){
-            throw new ResourceNotFoundError("Invalid email or password");
+            throw new ResourceNotFoundError("User not found");
         }else{
             const isPasswordValid = await bcrypt.compare(loginPayload.password, user.password);
             if(!isPasswordValid){
                 throw new ResourceNotFoundError("Invalid email or password");
             }
-            (res as any).sendSuccessResponse({id:user._id},"User logged in successfully",200);
+            const jwtPayload ={
+                id:user._id,
+                email:user.email,
+                role:user.role
+            }
+            const jwtToken = jwt.sign(jwtPayload, config.jwtSecret, {expiresIn:"1h"});
+            (res as any).sendSuccessResponse({id:user._id,token:jwtToken},"User logged in successfully",200);
         }
     }catch(error){
         next(error);
@@ -109,7 +116,7 @@ const login = async (req:Request, res:Response, next:NextFunction)=>{
 
 export default{
     registerUser,
-    login,
     verifyEmail,
-    resendOtp
+    resendOtp,
+    login
 }

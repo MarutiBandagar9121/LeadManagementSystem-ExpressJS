@@ -12,6 +12,8 @@ interface Config {
     redisPort: string;
     redisHost?: string;
     redisTls: string;
+    redisPassword?: string;
+    jwtSecret: string;
     [key: string]: string | number | undefined;
 }
 
@@ -21,7 +23,9 @@ const requiredEnvVars = [
     "MONGO_HOST",
     "MONGO_DB_NAME",
     "MONGO_PORT",
-    "REDIS_HOST"
+    "REDIS_HOST",
+    "REDIS_PASSWORD",
+    "JWT_SECRET"
 ] as const;
 
 for (const key of requiredEnvVars) {
@@ -40,7 +44,9 @@ const config: Config = {
     bcryptSaltRounds: process.env.BCRYPT_SALT_ROUNDS ? parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) : 10,
     redisHost: process.env.REDIS_HOST,
     redisPort: process.env.REDIS_PORT ? process.env.REDIS_PORT : "6379",
-    redisTls: process.env.REDIS_TLS ? process.env.REDIS_TLS : "false"
+    redisTls: process.env.REDIS_TLS ? process.env.REDIS_TLS : "false",
+    redisPassword: process.env.REDIS_PASSWORD,
+    jwtSecret:process.env.JWT_SECRET ?? "default_jwt_secret"
 }
 
 export default config;

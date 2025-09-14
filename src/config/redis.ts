@@ -10,7 +10,7 @@ const connectToRedis = async (): Promise<RedisClientType> => {
         }
         
         client = createClient({
-            url: `redis://${config.redisHost}:${config.redisPort}?tls=${config.redisTls}`,
+            url: `redis://default:${config.redisPassword}@${config.redisHost}:${config.redisPort}?tls=${config.redisTls}`,
         }) as RedisClientType;
         
         client.on('error',(err)=>{

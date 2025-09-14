@@ -4,7 +4,7 @@ import ResourceNotFoundError from '../errors/ResourceNotFoundError';
 import ErrorCodesEnum from '../constants/ErrorCodesEnum';
 import InvalidDataFormat from '../errors/InvalidDataFormat';
 import DuplicateRecordError from '../errors/DuplicateRecordError';
-
+import UnauthorizedRequest from '../errors/UnothorizedRequest';
 
 export const ErrorHandler = (
   error: Error,
@@ -19,7 +19,7 @@ export const ErrorHandler = (
   let message = 'Internal server error';
   let details = ""
 
-  if (error instanceof ResourceNotFoundError || error instanceof InvalidDataFormat || error instanceof DuplicateRecordError) {
+  if (error instanceof ResourceNotFoundError || error instanceof InvalidDataFormat || error instanceof DuplicateRecordError || error instanceof UnauthorizedRequest) {
     statusCode = error.statusCode;
     errorCode = error.code;
     message = error.message;
