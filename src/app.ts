@@ -7,6 +7,8 @@ import { connectToRedis } from "./config/redis";
 import Config from "./config/Config"
 import { ErrorHandler } from "./middleware/ErrorHandler";
 import { ResponseMiddleware } from "./middleware/ResponseMiddleware";
+import cookieParser from "cookie-parser";
+
 
 const startServer = async () => {
   try {
@@ -17,6 +19,7 @@ const startServer = async () => {
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
 
     //response middleware
     app.use(ResponseMiddleware);
@@ -28,7 +31,7 @@ const startServer = async () => {
 
 
     app.listen(Config.port, () => {
-      console.log(`Civil Guruji app listening on port ${Config.port}`);
+      console.log(`Lead Management app listening on port ${Config.port}`);
     });
 
     //error middleware

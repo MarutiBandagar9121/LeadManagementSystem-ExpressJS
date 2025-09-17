@@ -13,6 +13,7 @@ import UserStatusEnum from '../constants/UserStatusEnum';
 import jwt from 'jsonwebtoken';
 import { UserRefreshTokenModel } from '../repository/UserRefreshTokens';
 import { v4 as uuidv4 } from 'uuid';
+import mongoose from 'mongoose';
 
 const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
     try{
@@ -109,11 +110,21 @@ const login = async (req:Request, res:Response, next:NextFunction)=>{
                 email:user.email,
                 role:user.role
             }
-            const refreshToken = new UserRefreshTokenModel({
-                userId: user._id,
-                refreshToken: uuidv4(),
-            })
-            await refreshToken.save();
+            const refreshTokenEntity = await UserRefreshTokenModel.findOne({userId:user._id});
+            console.log("Refresh Token Entity: ",refreshTokenEntity);
+            if(!refreshTokenEntity){
+                const refreshToken = new UserRefreshTokenModel({
+                    userId: user._id,
+                    refreshToken: uuidv4(),
+                })
+                await refreshToken.save();
+                res.cookie('refresh_token', refreshToken.refreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                });
+            }
             const jwtToken = jwt.sign(jwtPayload, config.jwtSecret, {expiresIn:"1h"});
             res.cookie('jwt_token', jwtToken, {
                 httpOnly: true,
@@ -121,14 +132,47 @@ const login = async (req:Request, res:Response, next:NextFunction)=>{
                 sameSite: 'none',
                 maxAge: 15 * 60 * 1000, // 15 minutes
             });
-            res.cookie('refresh_token', refreshToken.refreshToken, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'none',
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            });
             (res as any).sendSuccessResponse({id:user._id},"User logged in successfully",200);
         }
+    }catch(error){
+        next(error);
+    }
+}
+
+const refreshToken = async(req:Request,res:Response,next:NextFunction)=>{
+    try{
+        const refreshToken = req.cookies.refresh_token;
+        const userId = req.params.userId;
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            throw new InvalidDataFormat("Invalid id format");
+        }
+        if(!refreshToken){
+            throw new ResourceNotFoundError("Refresh token or userId not found");
+        }
+        const userRefreshToken = await UserRefreshTokenModel.findOne({userId});
+        if(!userRefreshToken){
+            throw new ResourceNotFoundError("Refresh token not registerd");
+        }
+        if(userRefreshToken.refreshToken !== refreshToken){
+            throw new ResourceNotFoundError("Invalid refresh token");
+        }
+        const userData = await UserModel.findOne({_id:userId});
+        if(!userData){
+            throw new ResourceNotFoundError("User not found");
+        }
+        const jwtPayload = {
+            id:userData._id,
+            email:userData.email,
+            role:userData.role
+        }
+        const jwtToken = jwt.sign(jwtPayload, config.jwtSecret, {expiresIn:"1h"});
+        res.cookie('jwt_token', jwtToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            maxAge: 15 * 60 * 1000, // 15 minutes
+        });
+        (res as any).sendSuccessResponse({id:userData._id},"Token refreshed successfully",200);
     }catch(error){
         next(error);
     }
@@ -138,5 +182,6 @@ export default{
     registerUser,
     verifyEmail,
     resendOtp,
-    login
+    login,
+    refreshToken
 }

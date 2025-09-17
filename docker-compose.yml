@@ -1,17 +1,17 @@
 services:
   mongo:
     image: mongo
-    container_name: my-mongo-for-civil-guruji
+    container_name: mongo-container-for-leadmanagementSystem
     restart: always
     ports:
       - "${MONGO_PORT}:${MONGO_PORT}"
     volumes:
-      - mongo_civil_guruji_volume:/data/db
+      - mongo_lead_management_system_volume:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     networks:
-      - civil-guruji-network
+      - lead_management_system_network
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
       interval: 30s
@@ -21,52 +21,52 @@ services:
   
   redis:
     image: redis
-    container_name: my-redis-for-civil-guruji
+    container_name: redis-container-for-leadmanagementSystem
     restart: always
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     networks:
-      - civil-guruji-network
+      - lead_management_system_network
     volumes:
-      - redis_civil_guruji_volume:/data
+      - redis_lead_management_system_volume:/data
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
 
   # Express API service
-  # api:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   container_name: civil-guruji-api
-  #   restart: always
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - NODE_ENV=production
-  #     - PORT=3000
-  #     - MONGO_DB_NAME=${MONGO_DB_NAME}
-  #     - MONGO_USERNAME=${MONGO_USERNAME}
-  #     - MONGO_PASSWORD=${MONGO_PASSWORD}
-  #     - MONGO_HOST=${MONGO_HOST}
-  #     - MONGO_PORT=${MONGO_PORT}
-  #     - BCRYPT_SALT_ROUNDS=${BCRYPT_SALT_ROUNDS}
-  #     - REDIS_HOST=${REDIS_HOST}
-  #     - REDIS_PORT=${REDIS_PORT}
-  #     - REDIS_TLS=${REDIS_TLS}
-  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
-  #   depends_on:
-  #     mongo:
-  #       condition: service_healthy
-  #   networks:
-  #     - civil-guruji-network
-  #   volumes:
-  #     - ./logs:/app/logs
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: expressApi-container-for-leadmanagementSystem
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - BCRYPT_SALT_ROUNDS=${BCRYPT_SALT_ROUNDS}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_TLS=${REDIS_TLS}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - lead_management_system_network
+    volumes:
+      - ./logs:/app/logs
 
 networks:
-  civil-guruji-network:
+  lead_management_system_network:
     driver: bridge
 
 volumes:
-  mongo_civil_guruji_volume:
+  mongo_lead_management_system_volume:
     driver: local
-  redis_civil_guruji_volume:
+  redis_lead_management_system_volume:
     driver: local

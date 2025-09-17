@@ -39,4 +39,8 @@ docker compose down -v
 - All endpoints follow a unified response shape (success and error), making frontend integration predictable and simple.
 - Files/folders organized to keep routes, controllers, models, validators, middlewares, and error handling separate and easy to navigate.
 - A single error handling layer formats and logs errors consistently and returns structured error payloads to clients.
-- Docker Compose brings up a consistent environment (Express + MongoDB) with a single command.
+- **Docker Compose** orchestrates all containers including Express.js backend, MongoDB database, and Redis for seamless development and deployment
+- **Redis** integration for secure email verification via OTP (One-Time Password) system
+- **JWT authentication** with refresh token implementation for secure user sessions and automatic token renewal
+- Refresh token feature allows users to obtain new JWT tokens after expiration without requiring re-authentication
+- Docker Compose brings up a consistent environment (Express + MongoDB + Redis) with a single command.
