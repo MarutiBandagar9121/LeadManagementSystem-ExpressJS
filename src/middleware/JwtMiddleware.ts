@@ -4,15 +4,27 @@ import config from "../config/Config";
 import UnauthorizedRequest from "../errors/UnothorizedRequest";
 
 
-export const JwtMiddleware = (req:Request, res:Response, next:NextFunction) => {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-        throw new UnauthorizedRequest();
-    }
-    jwt.verify(token, config.jwtSecret, (err, decoded) => {
-        if (err) {
+export const JwtMiddleware = async (req:Request, res:Response, next:NextFunction) => {
+    try {
+        const token = req.cookies.jwt_token;
+        // console.log("JWt Token from cookies in JwtMiddleware: ", token);
+        if (!token) {
             throw new UnauthorizedRequest();
         }
+        
+        const decoded = await new Promise((resolve, reject) => {
+            jwt.verify(token, config.jwtSecret, (err:any, decoded:any) => {
+                if (err) {
+                    reject(new UnauthorizedRequest());
+                } else {
+                    resolve(decoded);
+                }
+            });
+        });
+        // console.log("Decoded JWT: ", decoded);
+        (req as any).user = decoded;
         next();
-    });
+    } catch (error) {
+        next(error);
+    }
 }

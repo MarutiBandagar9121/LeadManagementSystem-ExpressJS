@@ -11,6 +11,8 @@ import config from '../config/Config';
 import { client } from '../config/redis';
 import UserStatusEnum from '../constants/UserStatusEnum';
 import jwt from 'jsonwebtoken';
+import { UserRefreshTokenModel } from '../repository/UserRefreshTokens';
+import { v4 as uuidv4 } from 'uuid';
 
 const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
     try{
@@ -89,11 +91,12 @@ const login = async (req:Request, res:Response, next:NextFunction)=>{
     try{
         const parsed = UserLoginSchema.safeParse(req.body);
         if(!parsed.success){
-            throw new ResourceNotFoundError("Invalid Payload",z.treeifyError(parsed.error));
+            throw new InvalidDataFormat("Invalid Payload",z.treeifyError(parsed.error));
         }
         let loginPayload = parsed.data;
         console.log("Login Payload: ",loginPayload);
         const user = await UserModel.findOne({email:loginPayload.email});
+        
         if(!user){
             throw new ResourceNotFoundError("User not found");
         }else{
@@ -106,8 +109,25 @@ const login = async (req:Request, res:Response, next:NextFunction)=>{
                 email:user.email,
                 role:user.role
             }
+            const refreshToken = new UserRefreshTokenModel({
+                userId: user._id,
+                refreshToken: uuidv4(),
+            })
+            await refreshToken.save();
             const jwtToken = jwt.sign(jwtPayload, config.jwtSecret, {expiresIn:"1h"});
-            (res as any).sendSuccessResponse({id:user._id,token:jwtToken},"User logged in successfully",200);
+            res.cookie('jwt_token', jwtToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                maxAge: 15 * 60 * 1000, // 15 minutes
+            });
+            res.cookie('refresh_token', refreshToken.refreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            });
+            (res as any).sendSuccessResponse({id:user._id},"User logged in successfully",200);
         }
     }catch(error){
         next(error);
